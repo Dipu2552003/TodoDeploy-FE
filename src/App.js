@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
   const [todos, setTodos] = useState([]);
-  const [newTodo, setNewTodo] = useState('');
+  const [newTodo, setNewTodo] = useState("");
 
   useEffect(() => {
     fetchTodos();
+    console.log("API URL:", process.env.REACT_APP_API_URL);
   }, []);
 
   const fetchTodos = async () => {
@@ -15,17 +16,19 @@ const App = () => {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}`);
       setTodos(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching todos:", error);
     }
   };
 
   const addTodo = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, { title: newTodo });
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, {
+        title: newTodo,
+      });
       setTodos([...todos, response.data]);
-      setNewTodo('');
+      setNewTodo("");
     } catch (error) {
-      console.error(error);
+      console.error("Error adding todo:", error);
     }
   };
 
