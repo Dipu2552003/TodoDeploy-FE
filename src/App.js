@@ -5,31 +5,18 @@ import "bootstrap/dist/css/bootstrap.min.css";
 const App = () => {
   const [todos, setTodos] = useState([]);
   const [newTodo, setNewTodo] = useState("");
-  const [isConnected, setIsConnected] = useState(false); // Add connection state
+  const [backendConnected, setBackendConnected] = useState(false);
 
   useEffect(() => {
-    checkBackendConnection(); // Check connection first
     fetchTodos();
     console.log("API URL:", process.env.REACT_APP_API_URL);
   }, []);
 
-  const checkBackendConnection = async () => {
-    try {
-      // Make a quick test request to see if backend is reachable
-      await axios.get(`${process.env.REACT_APP_API_URL}`);
-      setIsConnected(true); // Set connected if request is successful
-    } catch (error) {
-      setIsConnected(false); // Set not connected on failure
-      console.error("Backend is not connected:", error);
-    }
-  };
-
   const fetchTodos = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL}/api/todos`
-      );
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}`);
       setTodos(response.data);
+      setBackendConnected(true); // Backend is connected if the request is successful
     } catch (error) {
       console.error("Error fetching todos:", error);
     }
@@ -37,12 +24,9 @@ const App = () => {
 
   const addTodo = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL}/api/todos`,
-        {
-          title: newTodo,
-        }
-      );
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}`, {
+        title: newTodo,
+      });
       setTodos([...todos, response.data]);
       setNewTodo("");
     } catch (error) {
@@ -53,16 +37,11 @@ const App = () => {
   return (
     <div className="container">
       <h1 className="mt-4">Todo List</h1>
-
-      {/* Connection status indicator */}
-      <div className="mb-3">
-        {isConnected ? (
-          <span style={{ color: "green" }}>● Connected to Backend</span>
-        ) : (
-          <span style={{ color: "red" }}>● Not Connected</span>
-        )}
-      </div>
-
+      {backendConnected ? (
+        <div className="alert alert-success">Backend connected</div>
+      ) : (
+        <div className="alert alert-danger">Backend not connected</div>
+      )}
       <div className="input-group mb-3">
         <input
           type="text"
